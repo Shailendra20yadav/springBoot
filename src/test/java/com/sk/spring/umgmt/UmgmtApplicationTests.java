@@ -1,4 +1,4 @@
-package com.hcl.umgmt;
+package com.sk.spring.umgmt;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
