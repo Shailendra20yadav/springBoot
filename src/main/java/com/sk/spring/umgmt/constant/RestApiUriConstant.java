@@ -7,5 +7,6 @@ public interface RestApiUriConstant {
 	String REST_ADMIN = "/rest/admin";
 	String LOGIN = "/login";
 	String LOGOUT="/logout";
+	String ROLES = "/roles";
 
 }

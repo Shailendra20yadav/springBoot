@@ -17,13 +17,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import com.sk.spring.umgmt.persistance.model.User;
+import com.sk.spring.umgmt.persistance.entity.User;
 import com.sk.spring.umgmt.persistance.repository.UserDetailsRepository;
 
 @Service
 public class UserDetailsAuthService implements UserDetailsService {
 	
-	private final Logger LOG =  LoggerFactory.getLogger(UserDetailsAuthService.class);
+	private static final Logger LOG =  LoggerFactory.getLogger(UserDetailsAuthService.class);
 	
 	@Autowired
 	private UserDetailsRepository userDetailsRepository;
@@ -34,7 +34,7 @@ public class UserDetailsAuthService implements UserDetailsService {
 
 	@Override
 	@Transactional(readOnly=true)
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String username) {
 		User user = userDetailsRepository.findByUsername(username);
 		
 		if (user == null) {
@@ -44,15 +44,15 @@ public class UserDetailsAuthService implements UserDetailsService {
 		UserBuilder userBuilder = org.springframework.security.core.userdetails.User.withUsername(username);
 		List<GrantedAuthority> authorities = null;
 		if (!CollectionUtils.isEmpty(user.getAuthorities())) {
-			authorities = user.getAuthorities().stream().map(auth -> new SimpleGrantedAuthority(auth.getAuthority()))
+			authorities = user.getAuthorities().stream().map(auth -> new SimpleGrantedAuthority(auth.getRoleMaster().getRoleName()))
 					.collect(Collectors.toList());
 		}else {
-			authorities =  new ArrayList<GrantedAuthority>();
+			authorities =  new ArrayList<>();
 		}
 		
 		return userBuilder.password(user.getPassword())
-				.disabled(user.getEnabled() == 0 ? true : false).authorities(authorities).build();
+				.disabled(!user.isEnabled()).authorities(authorities).build();
 
 	}
-
+	
 }
